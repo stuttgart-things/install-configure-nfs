@@ -5,7 +5,7 @@
   vars:
     kind: client
     permanent: true #false makes no fstab entry
-    remote_uri: nfs-server.labul.sva.de:/home
+    remote_uri: nfs.lab.de:/home
     mount_dir: /mnt/nfs/
 
   roles:
