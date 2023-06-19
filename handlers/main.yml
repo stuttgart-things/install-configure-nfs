@@ -1,0 +1,13 @@
+---
+- name: restart nfs
+  service:
+    name: "{{ item }}"
+    state: restarted
+  become: "yes"
+  with_items: "{{ nfs_service_names | default(nfs_service_names_default) }}"
+
+- name: restart firewalld
+  service:
+    name: firewalld
+    state: restarted
+  become: "yes"

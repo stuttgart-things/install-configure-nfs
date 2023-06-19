@@ -1,0 +1,32 @@
+---
+- name: Request nfs services information
+  ansible.builtin.uri:
+    url: https://{{ item.remote_uri.split(':')[0] }}/api/protocols/nfs/services
+    user: "{{ item.netapp_user }}"
+    password: "{{ item.netapp_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    validate_certs: "{{ nfs_netapp_verify_ssl }}"
+  register: sap_netapp_services_api
+  when: item.netapp_policy is defined
+
+- name: Get SVM UUID from services information
+  set_fact:
+    sap_netapp_nfs_svm_uuid: "{{ sap_netapp_services_api | community.general.json_query(json_query) }}"
+  vars:
+    json_query: "json.records[?svm.name == `{{ item.netapp_policy.svm.name }}`].svm.uuid"
+  when: item.netapp_policy is defined
+
+- name: Write export policy 
+  ansible.builtin.uri:
+    url: https://{{ item.remote_uri.split(':')[0] }}/api/protocols/nfs/export-policies/
+    user: "{{ item.netapp_user }}"
+    password: "{{ item.netapp_password }}"
+    method: POST
+    force_basic_auth: yes
+    status_code: 201,409
+    body: "{{ item.netapp_policy }}"
+    body_format: json
+    validate_certs: "{{ nfs_netapp_verify_ssl }}"
+  when: item.netapp_policy is defined

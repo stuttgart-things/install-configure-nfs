@@ -1,0 +1,33 @@
+---
+- name: Make sure temp mount is not present
+  ansible.posix.mount:
+    path: "{{ nfs_tmp_subdir_work }}"
+    state: absent
+  when: item.need_nfs_subfolder | bool
+  
+- name: Mount nfs share temporarily 
+  ansible.posix.mount:
+    src: "{{ item.remote_uri.split('/',1)[0] }}"
+    path: "{{ nfs_tmp_subdir_work }}"
+    fstype: nfs
+    state: mounted
+  when: item.need_nfs_subfolder | bool
+
+- name: Create subdirectory
+  ansible.builtin.file:
+    path: "{{ nfs_tmp_subdir_work }}/{{ item.remote_uri.split('/',1)[1] }}"
+    state: directory
+    mode: "{{ item.permissions }}"
+  when: item.need_nfs_subfolder | bool
+
+- name: Unmount temp nfs share
+  ansible.posix.mount:
+    path: "{{ nfs_tmp_subdir_work }}"
+    state: absent
+  when: item.need_nfs_subfolder | bool
+
+- name: Cleanup working dir
+  ansible.builtin.file:
+    path: "nfs_tmp_subdir_work"
+    state: absent
+  when: item.need_nfs_subfolder | bool

@@ -1,0 +1,12 @@
+---
+- hosts: "nfs"
+  gather_facts: true
+  become: true
+  vars:
+    kind: client
+    permanent: true #false makes no fstab entry
+    remote_uri: nfs-server.labul.sva.de:/home
+    mount_dir: /mnt/nfs/
+
+  roles:
+    - install-configure-nfs

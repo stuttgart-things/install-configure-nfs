@@ -1,0 +1,42 @@
+---
+- name: install nfs server packages
+  include_role:
+    name: install-requirements
+  vars:
+    update_packages: false
+    os_packages: "{{ item }}"
+  tags: setup
+  with_items: "{{ nfs_packages_client | default(nfs_packages_client_default) }}"
+
+- name: create nfs export directories - custom exports
+  ansible.builtin.file:
+    path: "{{ item.strip().split()[0] }}"
+    state: directory
+    mode: 0777
+  with_items: "{{ nfs_custom_exports }}"
+  notify: restart nfs
+  when: nfs_custom_exports is defined
+
+- name: create nfs export directories - standart exports
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0777
+  with_items: "{{ nfs_export_path }}"
+  notify: restart nfs
+  when: nfs_export_path is defined
+
+- name: configure nfs exports
+  ansible.builtin.template:
+    src: "{{ nfs_conf_template }}"
+    dest: "{{ nfs_conf_path }}"
+  vars:
+    exports: "{{ nfs_exports }}"
+  notify: restart nfs
+
+- name: manage nfs server services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: "{{ nfs_service_status }}"
+    enabled: "{{ nfs_service_enabled }}"
+  with_items: "{{ nfs_service_names | default(nfs_service_names_default) }}"

@@ -1,0 +1,20 @@
+---
+- name: UFW - Allow access to port
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.protocol }}"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  with_items:
+  - "{{ nfs_ports }}"
+
+- name: firewalld - Allow access to port
+  ansible.posix.firewalld:
+    port: "{{ item.port }}/{{ item.protocol }}"
+    zone: public
+    permanent: yes
+    state: enabled
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Rocky'
+  notify: restart firewalld
+  with_items:
+  - "{{ nfs_ports }}"

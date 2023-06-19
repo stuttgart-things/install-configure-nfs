@@ -1,0 +1,35 @@
+---
+###genral###
+nfs_force_version_three: false
+nfs_service_status: started
+nfs_netapp_verify_ssl: no
+nfs_service_enabled: yes
+nfs_conf_template: exports.j2
+nfs_conf_path: /etc/exports
+nfs_exports: []
+nfs_manage_firewall: false
+nfs_port_1:
+nfs_port_2:
+nfs_tmp_subdir_work: /tmp/nfswork
+permanent: true
+nfs_ports:
+  - port: 111
+    protocol: tcp
+  - port: 111
+    protocol: udp
+  - port: 2049
+    protocol: tcp
+  - port: 2049
+    protocol: udp
+
+###kubernetes###
+deploy_nfs_csi: false
+nfs_chart_namespace: nfs-csi
+nfs_chart_version: 4.0.16
+nfs_chart_server: sthings-pve1.labul.sva.de
+nfs_chart_server_path: /mnt/pve/datastore/nfs/kubernetes
+nfs_chart_storage_class_name: nfs-csi
+nfs_chart_storage_class_default: false
+nfs_chart_storage_class_reclaimPolicy: Delete
+nfs_chart_storage_class_archiveOnDelete: true
+nfs_chart_storage_class_allowVolumeExpansion: true

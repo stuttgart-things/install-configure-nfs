@@ -1,0 +1,26 @@
+---
+- name: Install nfs client packages
+  include_role:
+    name: install-requirements
+  vars:
+    update_packages: false
+    os_packages: "{{ item }}"
+  tags: setup
+  with_items: "{{ nfs_packages_client | default(nfs_packages_client_default) }}"
+
+- name: Manage nfs client services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items: "{{ nfs_client_services }}"
+  when: ansible_os_family != "Suse"
+
+- name: Mount nfs shares
+  ansible.posix.mount:
+    src: "{{ item.remote_uri }}"
+    path: "{{ item.mount_dir }}"
+    fstype: nfs
+    state: "{% if item.permanent == true %}mounted{% elif item.permanent == false %}remounted{% endif %}"
+  with_items:
+  - "{{ nfs_mnt }}"

@@ -1,0 +1,13 @@
+---
+- name: Configure default NFS version policy
+  ansible.builtin.replace:
+    path: /etc/nfsmount.conf
+    regexp: '# Defaultvers=4'
+    replace: 'Defaultvers=3'
+  register: nfs_policy_changed
+  
+- name: Restart NFS service
+  ansible.builtin.service:
+    name: nfs
+    state: restarted
+  when: nfs_policy_changed.changed | bool

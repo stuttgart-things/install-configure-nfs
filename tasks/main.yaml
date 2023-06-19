@@ -1,0 +1,58 @@
+---
+- name: Include variable overrides
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yaml"
+        - "vars/{{ ansible_distribution }}.yaml"
+        - "vars/{{ ansible_os_family }}.yaml"
+        - "vars/main.yaml"
+  tags: nfssetup
+
+- name: Import nfs server depend tasks
+  ansible.builtin.include_tasks: nfs-server.yaml
+  when: kind == "server"
+  tags: nfssetup
+
+- name: Import Manage firewall tasks - allow nfs ports
+  ansible.builtin.include_tasks: firewall.yaml
+  when: 
+    - kind == "server"
+    - nfs_manage_firewall | bool == true
+  tags: nfssetup
+
+- name: Override sid on hana setup
+  ansible.builtin.set_fact:
+    sid: "{{ hana_sid }}"
+  when: hana_sid is defined
+
+- name: Override sid on s4 setup
+  ansible.builtin.set_fact:
+    sid: "{{ x4_sid }}"
+  when: x4_sid is defined
+
+- name: Apply nfs mount depended tasks
+  block:
+    - name: Apply netapp policies
+      ansible.builtin.include_tasks: configure_nfs_settings.yaml
+      when: kind == "client" and nfs_mnt is defined
+      when: nfs_mnt is defined
+      with_items:
+      - "{{ nfs_mnt }}"
+
+    - name: Apply netapp policies
+      ansible.builtin.include_tasks: netapp.yaml
+      when: nfs_force_version_three | bool and nfs_mnt is defined
+
+    - name: Apply subdirs to nfs share
+      ansible.builtin.include_tasks: create-nfs-subdir.yaml
+      when: kind == "client" and nfs_mnt is defined
+      with_items:
+      - "{{ nfs_mnt }}"
+
+    - name: Import nfs client depend tasks
+      ansible.builtin.include_tasks: nfs-client.yaml
+      when: kind == "client"
+      tags: nfssetup
+      
+  when: nfs_mnt is defined

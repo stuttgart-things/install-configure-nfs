@@ -1,0 +1,16 @@
+---
+- hosts: "nfs"
+  gather_facts: true
+  become: true
+  vars:
+    kind: server
+    permanent: true
+    nfs_manage_firewall: true
+    #nfs_custom_exports:  #optional use this or nfs_export_path
+    #  - / *(ro,fsid=0) #You can specify more mounts at one time
+    #  - /var/lib/docker *(rw,sync,nohide)
+    nfs_export_path:      #optional use this or nfs_custom_exports
+      - /srv/nfs
+
+  roles:
+    - install-configure-nfs
