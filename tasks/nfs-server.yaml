@@ -6,7 +6,7 @@
     update_packages: false
     os_packages: "{{ item }}"
   tags: setup
-  with_items: "{{ nfs_packages_client | default(nfs_packages_client_default) }}"
+  with_items: "{{ nfs_packages_server | default(nfs_packages_server_default) }}"
 
 - name: create nfs export directories - custom exports
   ansible.builtin.file:
