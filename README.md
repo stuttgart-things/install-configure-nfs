@@ -29,159 +29,19 @@ ansible-galaxy install -r /tmp/requirements.yaml --force
 <details><summary>Example playbook for an nfs client installation with mount on a netapp</summary>
 
 ```
-- hosts: "nfs"
+- hosts: all
   gather_facts: true
   become: true
   vars:
     kind: client
-    nfs_force_version_three: true
 
     nfs_mnt:
-      - name: <name>
+      - name: archive
         permanent: true #false makes no fstab entry
-        need_nfs_subfolder: true
-        remote_uri: <uri>
-        mount_dir: /usr/sap/{{ sid }}
+        need_nfs_subfolder: false
+        remote_uri: smt-final-2.labul.sva.de:/archive
+        mount_dir: /archive
         permissions: 777
-        netapp_user: <user>
-        netapp_password: <passwd>
-        netapp_policy:
-          name: media-pol
-          svm:
-            name: "SVM_00001678_NAS_HANA"
-          rules:
-          - rw_rule:
-            - any
-            superuser:
-            - any
-            protocols:
-            - nfs
-            ro_rule:
-            - any
-            clients:
-            - match: 0.0.0.0/0
-            anonymous_user: string
-      - name: hana-home
-        permanent: true #false makes no fstab entry
-        need_nfs_subfolder: true
-        remote_uri: <uri>
-        mount_dir: /usr/sap/{{ sid }}/home
-        permissions: 777
-        netapp_user: <user>
-        netapp_password: <passwd>
-        netapp_policy:
-          name: media-pol
-          svm:
-            name: "SVM_00001678_NAS_HANA"
-          rules:
-          - rw_rule:
-            - any
-            superuser:
-            - any
-            protocols:
-            - nfs
-            ro_rule:
-            - any
-            clients:
-            - match: 0.0.0.0/0
-            anonymous_user: string
-      - name: hana-shared
-        permanent: true #false makes no fstab entry
-        need_nfs_subfolder: true
-        remote_uri: <uri>
-        mount_dir: /hana/shared/{{ sid }}
-        permissions: 777
-        netapp_user: <user>
-        netapp_password: <passwd>
-        netapp_policy:
-          name: media-pol
-          svm:
-            name: "SVM_00001678_NAS_HANA"
-          rules:
-          - rw_rule:
-            - any
-            superuser:
-            - any
-            protocols:
-            - nfs
-            ro_rule:
-            - any
-            clients:
-            - match: 0.0.0.0/0
-            anonymous_user: string      
-      - name: hana-dblog
-        permanent: true #false makes no fstab entry
-        need_nfs_subfolder: true
-        remote_uri: <uri>
-        mount_dir: /hana/log/{{ sid }}
-        permissions: 777
-        netapp_user: <user>
-        netapp_password: <passwd>
-        netapp_policy:
-          name: media-pol
-          svm:
-            name: "SVM_00001678_NAS_HANA"
-          rules:
-          - rw_rule:
-            - any
-            superuser:
-            - any
-            protocols:
-            - nfs
-            ro_rule:
-            - any
-            clients:
-            - match: 0.0.0.0/0
-            anonymous_user: string
-      - name: hana-dbdata
-        permanent: true #false makes no fstab entry
-        need_nfs_subfolder: true
-        remote_uri: <uri>
-        mount_dir: /hana/data/{{ sid }}
-        permissions: 777
-        netapp_user: <user>
-        netapp_password: <passwd>
-        netapp_policy:
-          name: media-pol
-          svm:
-            name: "SVM_00001678_NAS_HANA"
-          rules:
-          - rw_rule:
-            - any
-            superuser:
-            - any
-            protocols:
-            - nfs
-            ro_rule:
-            - any
-            clients:
-            - match: 0.0.0.0/0
-            anonymous_user: string
-      - name: media
-        permanent: true #false makes no fstab entry
-        need_nfs_subfolder: true
-        remote_uri: <uri>
-        mount_dir: /mnt/media
-        permissions: 777
-        netapp_user: <user>
-        netapp_password: <passwd>
-        netapp_policy:
-          name: media-pol
-          svm:
-            name: "SVM_00001678_NAS_HANA"
-          rules:
-          - rw_rule:
-            - any
-            superuser:
-            - any
-            protocols:
-            - nfs
-            ro_rule:
-            - any
-            clients:
-            - match: 0.0.0.0/0
-            anonymous_user: string
-
 
   roles:
     - install-configure-nfs
