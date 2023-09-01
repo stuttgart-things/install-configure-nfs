@@ -13,7 +13,7 @@
     name: "{{ item }}"
     state: started
     enabled: yes
-  with_items: "{{ nfs_client_services }}"
+  with_items: "{{ nfs_client_services | default(nfs_service_names_default) }}"
   when: ansible_os_family != "Suse"
 
 - name: Mount nfs shares
