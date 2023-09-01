@@ -14,7 +14,7 @@
     state: started
     enabled: yes
   with_items: "{{ nfs_client_services }}"
-  when: ansible_os_family != "Suse"
+  when: ansible_os_family != "Suse" and nfs_client_services is defined
 
 - name: Mount nfs shares
   ansible.posix.mount:
