@@ -31,24 +31,7 @@
     sid: "{{ x4_sid }}"
   when: x4_sid is defined
 
-- name: Apply nfs mount depended tasks
-  block:
-    - name: Configure nfs settings
-      ansible.builtin.include_tasks: configure-nfs-settings.yaml
-      when: kind == "client" and nfs_mnt is defined
-      when: nfs_mnt is defined
-      with_items:
-        - "{{ nfs_mnt }}"
+- name: Import nfs client depend tasks
+  ansible.builtin.include_tasks: nfs-client.yaml
+  when: kind == "client"
 
-    - name: Apply subdirs to nfs share
-      ansible.builtin.include_tasks: create-nfs-subdir.yaml
-      when: kind == "client" and nfs_mnt is defined
-      with_items:
-        - "{{ nfs_mnt }}"
-
-    - name: Import nfs client depend tasks
-      ansible.builtin.include_tasks: nfs-client.yaml
-      when: kind == "client"
-      tags: nfssetup
-      
-  when: nfs_mnt is defined
